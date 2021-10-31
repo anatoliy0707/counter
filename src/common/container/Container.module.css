@@ -1,0 +1,28 @@
+.container {
+    display: grid;
+
+    padding: 50px;
+    margin: 10px;
+    width: 300px;
+    border: 5px solid #1e90ff;
+    border-radius: 20px;
+}
+
+.topBlock {
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    height: 80px;
+    padding: 20px;
+    margin: 10px;
+    border: 5px solid #1e90ff;
+    border-radius: 20px;
+}
+
+
+.bottomBlock {
+    padding: 20px;
+    margin: 10px;
+    border: 5px solid #1e90ff;
+    border-radius: 20px;
+}
