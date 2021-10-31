@@ -4,8 +4,9 @@
     padding: 50px;
     margin: 10px;
     width: 300px;
-    border: 5px solid #1e90ff;
+    border: 5px solid #500805;
     border-radius: 20px;
+    background: #9D331F
 }
 
 .topBlock {
@@ -15,14 +16,16 @@
     height: 80px;
     padding: 20px;
     margin: 10px;
-    border: 5px solid #1e90ff;
+    border: 5px solid #500805;
     border-radius: 20px;
+    background: #BC6D4F;
 }
 
 
 .bottomBlock {
     padding: 20px;
     margin: 10px;
-    border: 5px solid #1e90ff;
+    border: 5px solid #500805;
     border-radius: 20px;
+    background: #BC6D4F
 }

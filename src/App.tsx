@@ -97,7 +97,7 @@ const App = () => {
             >
                 {mode === CONFIG && <span className={error ? "red" : "view"}>{error || message}</span>}
                 {mode === COUNTER &&
-                    <span className={maxCountValue === countValue ? "red" : "view"}>{countValue}</span>}
+                <span className={maxCountValue === countValue ? "red" : "view"}>{countValue}</span>}
             </Container>
         </div>
     )
