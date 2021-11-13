@@ -1,87 +1,87 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
-
+import React, {ChangeEvent, useEffect} from 'react';
 import './App.css';
-
 import {Container} from "./common/container/Container";
 import SuperButton from "./common/c2-SuperButton/SuperButton";
 import SuperInputText from "./common/c1-SuperInputText/SuperInputText";
+import {useDispatch, useSelector} from 'react-redux';
+import {AppStateType} from './bll/store';
+import {
+    ErrorType,
+    incCurrentCountValueAC,
+    MessageType,
+    ModeType,
+    resetCountValueAC, setCorrectStartValuesAC, setCounterAC, setErrorAC, setValuesFromLocalStorageAC,
+    viewInputValueOnSettingAC
+} from './bll/counterReducer';
+import {isValueCorrect} from "./utilits/isValueCorrect";
+
 
 const COUNTER = "counter"
 const CONFIG = "config"
-const STEP_VALUE = 1
+
 
 const App = () => {
-    const [maxCountValue, setMaxCountValue] = useState(5)
-    const [initCountValue, setInitCountValue] = useState(0)
-    const [countValue, setCountValue] = useState(initCountValue)
-    const [error, setError] = useState<string>('')
-    const [message, setMessage] = useState<string>("set values and press 'set'")
-    const [mode, setMode] = useState(CONFIG)
 
-    // const isValueCorrect = field === 'startValue'
-    // ? isStartValueCorrect(e.target.value)
-    // : isMaxValueCorrect(e.target.value)
+    const currentCountValue = useSelector<AppStateType, number>(state => state.counter.currentCountValue)
+    const startCountValue = useSelector<AppStateType, number>(state => state.counter.startCountValue)
+    const maxCountValue = useSelector<AppStateType, number>(state => state.counter.maxCountValue)
+    const message = useSelector<AppStateType, MessageType>(state => state.counter.message)
+    const error = useSelector<AppStateType, ErrorType>(state => state.counter.error)
+    const mode = useSelector<AppStateType, ModeType>(state => state.counter.mode)
+    const countDispatch = useDispatch()
+
 
     useEffect(() => {
-        const initValueAsString = localStorage.getItem('initValue')
+        debugger
+        const startValueAsString = localStorage.getItem('startValue')
         const maxValueAsString = localStorage.getItem('maxValue')
 
-        if (initValueAsString && maxValueAsString) {
-            setInitCountValue(Number(initValueAsString))
-            setMaxCountValue(Number(maxValueAsString))
+        if (startValueAsString && maxValueAsString) {
+            const startValue = Number(startValueAsString)
+            const maxValue = Number(maxValueAsString)
+            countDispatch(setValuesFromLocalStorageAC(startValue, maxValue))
         }
     }, [])
 
-    const setValues = () => {
-        localStorage.setItem('initValue', initCountValue.toString())
+    const setCounter = () => {
+        localStorage.setItem('startValue', startCountValue.toString())
         localStorage.setItem('maxValue', maxCountValue.toString())
-        setCountValue(initCountValue)
-        setMode(COUNTER)
+        countDispatch(setCounterAC())
     }
 
-
-    // Refactor!!!
     const onChangeStartValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setInitCountValue(Number(e.currentTarget.value))
-        if (Number(e.currentTarget.value) < 0 || Number(e.currentTarget.value) >= maxCountValue) {
-            setError("Incorrect value!")
-        } else {
-            setError('')
-            setInitCountValue(Number(e.currentTarget.value))
-            setMode(CONFIG)
-            setMessage("set values and press 'set'")
-        }
+        const event = Number(e.currentTarget.value)
+       countDispatch(viewInputValueOnSettingAC(event, "START")) // выводит текущее значение инпута при настройке, даже некорректное
+        !isValueCorrect(event, maxCountValue, "START")
+            ? countDispatch(setErrorAC())
+            : countDispatch(setCorrectStartValuesAC(event, "START"))
     }
-    // Refactor!!!
+
     const onChangeMaxValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setMaxCountValue(Number(e.currentTarget.value))
-        if (Number(e.currentTarget.value) === initCountValue || Number(e.currentTarget.value) < initCountValue) {
-            setError("Incorrect value!")
-        } else {
-            setError('')
-            setMaxCountValue(Number(e.currentTarget.value))
-            setMode(CONFIG)
-            setMessage("set values and press 'set'")
-        }
+        const event = Number(e.currentTarget.value)
+        countDispatch(viewInputValueOnSettingAC(event, "MAX")) // выводит текущее значение инпута при настройке, даже некорректное
+        !isValueCorrect(event, startCountValue, "MAX")
+            ? countDispatch(setErrorAC())
+            : countDispatch(setCorrectStartValuesAC(event, "MAX"))
     }
 
     const onClickIncHandler = () => {
-        setCountValue(countValue + STEP_VALUE)
+        countDispatch(incCurrentCountValueAC())
     }
 
     const onClickResetHandler = () => {
-        setCountValue(initCountValue)
+        countDispatch(resetCountValueAC())
     }
 
 // Components!!
     return (
         <div className="App">
             <Container
-                buttons={[<SuperButton disabled={mode === COUNTER || !!error} onClick={setValues}
+                buttons={[<SuperButton disabled={mode === COUNTER || !!error} onClick={setCounter}
                                        key="SET">SET</SuperButton>]}>
                 <span>start value:
                 <SuperInputText error={error} type="number" onChange={onChangeStartValueHandler}
-                                value={initCountValue}/>
+                                value={startCountValue}/>
                                 </span>
                 <span>max value:
                 <SuperInputText error={error} type="number" onChange={onChangeMaxValueHandler} value={maxCountValue}/>
@@ -89,15 +89,15 @@ const App = () => {
             </Container>
             <Container
                 buttons={[
-                    <SuperButton disabled={mode === CONFIG || countValue === maxCountValue} key="INC"
+                    <SuperButton disabled={mode === CONFIG || currentCountValue === maxCountValue} key="INC"
                                  onClick={onClickIncHandler}>INC</SuperButton>,
-                    <SuperButton disabled={mode === CONFIG || countValue === initCountValue} key="RESET"
+                    <SuperButton disabled={mode === CONFIG || currentCountValue === startCountValue} key="RESET"
                                  onClick={onClickResetHandler}>RESET</SuperButton>,
                 ]}
             >
                 {mode === CONFIG && <span className={error ? "red" : "view"}>{error || message}</span>}
                 {mode === COUNTER &&
-                <span className={maxCountValue === countValue ? "red" : "view"}>{countValue}</span>}
+                <span className={maxCountValue === currentCountValue ? "red" : "view"}>{currentCountValue}</span>}
             </Container>
         </div>
     )
