@@ -37,21 +37,21 @@ const App = () => {
         const maxValueAsString = localStorage.getItem('maxValue')
 
         if (startValueAsString && maxValueAsString) {
-            const startValue = Number(startValueAsString)
-            const maxValue = Number(maxValueAsString)
+            const startValue = JSON.parse(startValueAsString)
+            const maxValue = JSON.parse(maxValueAsString)
             countDispatch(setValuesFromLocalStorageAC(startValue, maxValue))
         }
     }, [])
 
     const setCounter = () => {
-        localStorage.setItem('startValue', startCountValue.toString())
-        localStorage.setItem('maxValue', maxCountValue.toString())
+        localStorage.setItem('startValue', JSON.stringify(startCountValue))
+        localStorage.setItem('maxValue', JSON.stringify(maxCountValue))
         countDispatch(setCounterAC())
     }
 
     const onChangeStartValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
         const event = Number(e.currentTarget.value)
-       countDispatch(viewInputValueOnSettingAC(event, "START")) // выводит текущее значение инпута при настройке, даже некорректное
+        countDispatch(viewInputValueOnSettingAC(event, "START")) // выводит текущее значение инпута при настройке, даже некорректное
         !isValueCorrect(event, maxCountValue, "START")
             ? countDispatch(setErrorAC())
             : countDispatch(setCorrectStartValuesAC(event, "START"))
